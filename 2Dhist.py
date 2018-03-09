@@ -1,11 +1,18 @@
+# 2Dhist.py 
+# Plot the 2D Scatter-Histogram diagram
+# z_spec v.s. z_phot(z_m2)
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
 
-BINS=60
-OFFSET = 0.
+BINS=60 # Number of bins
+OFFSET = 0. # offset for bar bar3d chart
+filename = "COSMOS2015_bc03.zout" # data
+
 # Read in data 
-data = np.genfromtxt("COSMOS2015_bc03.zout",names=True, dtype=None)
+data = np.genfromtxt(filename,names=True, dtype=None)
+# Select sources with good redshift estimate
 good_spec = np.logical_and(data['z_spec']>0.,data['z_spec']<10.)
 good_m2 = np.logical_and(data['z_m2']>0.,data['z_m2']<10.)
 good_both = np.logical_and(good_spec, good_m2)
@@ -40,17 +47,11 @@ axScatter = plt.axes(rect_scatter)
 axHistx = plt.axes(rect_histx)
 axHisty = plt.axes(rect_histy)
 
-# no labels
-#axHistx.xaxis.set_major_formatter(nullfmt)
-#axHisty.yaxis.set_major_formatter(nullfmt)
-
 # the scatter plot:
 axScatter.scatter(X, Y, alpha=0.5)
 xpos = np.arange(0.,6.,6./BINS)
 ypos = np.arange(0.,6.,6./BINS)
-#print(xpos,len(xpos))
-#print(ypos,len(ypos))
-#print(hist,hist.shape)
+# contour plot 
 lev = np.geomspace(np.min(hist)+0.1,np.max(hist),20)
 axScatter.contour(xpos, ypos, hist, levels=lev)
 

@@ -1,3 +1,5 @@
+# 3Dhist.py
+# Plot 3D histogram 
 from mpl_toolkits.mplot3d import axes3d
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -10,7 +12,7 @@ WIDTH = 6/BINS*0.9
 fig = plt.figure()
 fig.suptitle("Redshift Distribution of COSMOS2015 Field (Slice)")
 ax = fig.gca(projection='3d')
-#X, Y, Z = axes3d.get_test_data(0.05)
+
 # Read in data 
 data = np.genfromtxt("COSMOS2015_bc03.zout",names=True, dtype=None)
 good_spec = np.logical_and(data['z_spec']>0.,data['z_spec']<10.)
@@ -34,15 +36,10 @@ dx =  WIDTH*np.ones_like(zpos)
 dy = dx.copy()
 dz = hist.flatten()
 
-# Plot the 3D surface
+# Plot the 3D bar chart
 ax.bar3d(xpos, ypos, zpos, dx, dy, dz, color='b', alpha=0.3, cmap=cm.coolwarm)
 
-# Plot projections of the contours for each dimension.  By choosing offsets
-# that match the appropriate axes limits, the projected contours will sit on
-# the 'walls' of the graph
-#cset = ax.contourf(X, Y, Z, zdir='z', offset=-100, cmap=cm.coolwarm)
-#cset = ax.contourf(X, Y, Z, zdir='x', offset=-40, cmap=cm.coolwarm)
-#cset = ax.contourf(X, Y, Z, zdir='y', offset=40, cmap=cm.coolwarm)
+# Plot projections of the histogram for each dimension. 
 ax.bar(z_spec_xedges[:-1], z_spec_hist*3, zs=7., zdir='y', align='edge',width=6./BINS, alpha=0.7)
 ax.bar(z_m2_xedges[:-1], z_m2_hist*3, zs=-1., zdir='x', align='edge', width=6./BINS, alpha=0.7)
 

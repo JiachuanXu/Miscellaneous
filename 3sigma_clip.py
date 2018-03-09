@@ -1,9 +1,13 @@
+# 3sigma_clip.py
+# clip the sample whose dz/(1+z) beyond 3 sigma deviation
+# iterative
 import numpy as np 
 from astropy.stats import sigma_clip
 filename = "OUTPUT/COSMOS2015_bc03.zout"
 survive_name = "OUTPUT/COSMOS2015_bc03_survive.zout"
 clipout_name = "OUTPUT/COSMOS2015_bc03_clipout.zout"
 
+# decide whether it's cliped or not
 def notclipped(inp):
 	mean = np.mean(inp)
 	dev = np.std(inp)
@@ -15,6 +19,7 @@ def notclipped(inp):
 			mask = np.append(mask, False)
 	return mask
 
+# decide whether it's a galaxy(sample with good redshift)
 def isgalaxy(z_spec):
 	mask = []
 	for i in z_spec:
@@ -27,16 +32,18 @@ def isgalaxy(z_spec):
 
 data = np.genfromtxt(filename, names=True, dtype=None)
 galaxy_list = np.array([],dtype=int)
+# select sample with good z_spec
 for i in np.arange(0,len(data),1):
 	if (data['z_spec'][i]>0.) and (data['z_spec'][i]<10.):
 		galaxy_list = np.append(galaxy_list, int(i))
+# construct new array with new column dz/(1+z)
 new_column = abs(data['z_m2'][galaxy_list]-data['z_spec'][galaxy_list])/(data['z_spec'][galaxy_list]+1.0)
 new_dtype = np.dtype(data.dtype.descr+[('accuracy','float64')])
 new_data = np.zeros(len(galaxy_list), dtype = new_dtype)
 for i in data.dtype.names:
 	new_data[i]=data[i][galaxy_list]
 new_data['accuracy']=new_column
-
+# sigma clip, return a mask 
 filtered_data = sigma_clip(new_data['accuracy'], sigma=3, iters=None)
 survive_size = len(galaxy_list)-np.sum(filtered_data.mask)
 clipout_size = np.sum(filtered_data.mask)
@@ -44,6 +51,7 @@ survive_data = np.zeros(survive_size, dtype = new_dtype)
 clipout_data = np.zeros(clipout_size, dtype = new_dtype)
 survive_ct = -1
 clipout_ct = -1
+# sort data into two categories according to the mask
 for i in np.arange(0,len(galaxy_list),1):
 	if ~filtered_data.mask[i]:
 		survive_ct += 1

@@ -1,3 +1,5 @@
+# commands.py
+# used to run sextrator, with different configuration
 import numpy as np
 import os
 
